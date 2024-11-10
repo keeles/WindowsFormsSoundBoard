@@ -1,4 +1,7 @@
-﻿namespace Comp3514Quiz2
+﻿using MySql.Data.MySqlClient;
+
+
+namespace Comp3514Quiz2
 {
     partial class CustomSoundsForm
     {
@@ -196,6 +199,7 @@
             Margin = new Padding(5, 4, 5, 4);
             Name = "CustomSoundsForm";
             Text = "CustomSoundsForm";
+            Load += CustomSoundsForm_Load;
             ResumeLayout(false);
             PerformLayout();
         }
