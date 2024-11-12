@@ -63,7 +63,6 @@
             deathButton.TabIndex = 1;
             deathButton.Text = "Death";
             deathButton.UseVisualStyleBackColor = true;
-            deathButton.Click += deathButton_Click;
             // 
             // boomButton
             // 
@@ -74,7 +73,6 @@
             boomButton.TabIndex = 2;
             boomButton.Text = "Boom";
             boomButton.UseVisualStyleBackColor = true;
-            boomButton.Click += boomButtonClick;
             // 
             // birdButton
             // 
@@ -85,7 +83,6 @@
             birdButton.TabIndex = 3;
             birdButton.Text = "Birdies";
             birdButton.UseVisualStyleBackColor = true;
-            birdButton.Click += birdButton_Click;
             // 
             // ouchButton
             // 
@@ -96,7 +93,6 @@
             ouchButton.TabIndex = 4;
             ouchButton.Text = "Ouchie";
             ouchButton.UseVisualStyleBackColor = true;
-            ouchButton.Click += ouchButton_Click;
             // 
             // deathBox
             // 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,78 +9,113 @@ using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace Comp3514Quiz2
 {
     public partial class GamerSoundsForm : Form
     {
-        private SoundPlayer deathSoundPlayer;
-        private SoundPlayer ouchSoundPlayer;
-        private SoundPlayer boomSoundPlayer;
-        private SoundPlayer birdSoundPlayer;
+        private Dictionary<int, SoundPlayer> soundPlayers;
+        private Dictionary<int, string> soundNames;
 
         public GamerSoundsForm()
         {
             InitializeComponent();
-            deathSoundPlayer = new SoundPlayer("death.wav");
-            ouchSoundPlayer = new SoundPlayer("death_pain_grunts.wav");
-            boomSoundPlayer = new SoundPlayer("explode.wav");
-            birdSoundPlayer = new SoundPlayer("koertes-ccby-birdsongloop16s.wav");
+            soundPlayers = new Dictionary<int, SoundPlayer>();
+            soundNames = new Dictionary<int, string>();
+
+            deathButton.Click += Button_Click;
+            boomButton.Click += Button_Click;
+            birdButton.Click += Button_Click;
+            ouchButton.Click += Button_Click;
+
+            string connString = Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING");
+
+            if (connString == null)
+            {
+                MessageBox.Show("Error connecting to database");
+                return;
+            }
+            using (MySqlConnection conn = new MySqlConnection(connString))
+            {
+                try
+                {
+                    conn.Open();
+                    string customSoundQuery = "SELECT name, file_path, sound_id FROM gamer_sounds;";
+
+                    using (MySqlCommand cmd = new MySqlCommand(customSoundQuery, conn))
+                    {
+                        MySqlDataReader reader = cmd.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            string soundName = reader.GetString("name");
+                            string soundPath = reader.GetString("file_path");
+                            int buttonId = reader.GetInt32("sound_id");
+
+                            soundPlayers[buttonId] = new SoundPlayer(soundPath);
+                            soundNames[buttonId] = soundName;
+
+                            UpdateButtonText(buttonId, soundName);
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
 
-        private void deathButton_Click(object sender, EventArgs e)
+        private void Button_Click(object sender, EventArgs e)
         {
-            if (deathButton.Text == "Death")
+            Button clickedButton = sender as Button;
+
+            if (clickedButton == null) return;
+
+            int buttonId = -1;
+
+            if (clickedButton == deathButton) buttonId = 9;
+            else if (clickedButton == boomButton) buttonId = 10;
+            else if (clickedButton == birdButton) buttonId = 11;
+            else if (clickedButton == ouchButton) buttonId = 12;
+
+            if (buttonId != -1 && soundPlayers.ContainsKey(buttonId))
             {
-                deathSoundPlayer.Play();
-                deathButton.Text = "Stop";
-            }
-            else
-            {
-                deathSoundPlayer.Stop();
-                deathButton.Text = "Death";
+                var soundPlayer = soundPlayers[buttonId];
+                var soundName = soundNames[buttonId];
+                if (clickedButton.Text == soundName)
+                {
+                    soundPlayer.Play();
+                    clickedButton.Text = "Stop";
+                }
+                else
+                {
+                    soundPlayer.Stop();
+                    clickedButton.Text = soundName;
+                }
             }
         }
 
-        private void boomButtonClick(object sender, EventArgs e)
+        private void UpdateButtonText(int buttonId, string soundName)
         {
-            if (boomButton.Text == "Boom")
+            switch (buttonId)
             {
-                boomSoundPlayer.Play();
-                boomButton.Text = "Stop";
-            }
-            else
-            {
-                boomSoundPlayer.Stop();
-                boomButton.Text = "Boom";
-            }
-        }
-
-        private void birdButton_Click(object sender, EventArgs e)
-        {
-            if (birdButton.Text == "Birdies")
-            {
-                birdSoundPlayer.Play();
-                birdButton.Text = "Stop";
-            }
-            else
-            {
-                birdSoundPlayer.Stop();
-                birdButton.Text = "Birdies";
-            }
-        }
-
-        private void ouchButton_Click(object sender, EventArgs e)
-        {
-            if (ouchButton.Text == "Ouchie")
-            {
-                ouchSoundPlayer.Play();
-                ouchButton.Text = "Stop";
-            }
-            else
-            {
-                ouchSoundPlayer.Stop();
-                ouchButton.Text = "Ouchie";
+                case 1:
+                    deathButton.Text = soundName;
+                    break;
+                case 2:
+                    boomButton.Text = soundName;
+                    break;
+                case 3:
+                    birdButton.Text = soundName;
+                    break;
+                case 4:
+                    ouchButton.Text = soundName;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -87,11 +123,11 @@ namespace Comp3514Quiz2
         {
             if (this.deathBox.Checked)
             {
-                this.favBox.Items.Add("Death");
+                this.favBox.Items.Add(soundNames[9]);
             }
             else
             {
-                this.favBox.Items.Remove("Death");
+                this.favBox.Items.Remove(soundNames[9]);
             }
         }
 
@@ -99,11 +135,11 @@ namespace Comp3514Quiz2
         {
             if (this.boomBox.Checked)
             {
-                this.favBox.Items.Add("Boom");
+                this.favBox.Items.Add(soundNames[10]);
             }
             else
             {
-                this.favBox.Items.Remove("Boom");
+                this.favBox.Items.Remove(soundNames[10]);
             }
         }
 
@@ -111,11 +147,11 @@ namespace Comp3514Quiz2
         {
             if (this.birdBox.Checked)
             {
-                this.favBox.Items.Add("Birdies");
+                this.favBox.Items.Add(soundNames[11]);
             }
             else
             {
-                this.favBox.Items.Remove("Birdies");
+                this.favBox.Items.Remove(soundNames[11]);
             }
         }
 
@@ -123,11 +159,11 @@ namespace Comp3514Quiz2
         {
             if (this.ouchBox.Checked)
             {
-                this.favBox.Items.Add("Ouchie");
+                this.favBox.Items.Add(soundNames[12]);
             }
             else
             {
-                this.favBox.Items.Remove("Ouchie");
+                this.favBox.Items.Remove(soundNames[12]);
             }
         }
     }

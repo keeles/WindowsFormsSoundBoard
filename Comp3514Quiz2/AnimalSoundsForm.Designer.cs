@@ -60,7 +60,7 @@
             woofButton.TabIndex = 1;
             woofButton.Text = "Dog";
             woofButton.UseVisualStyleBackColor = true;
-            woofButton.Click += woofButton_Click;
+            //woofButton.Click += woofButton_Click;
             // 
             // meowButton
             // 
@@ -71,7 +71,7 @@
             meowButton.TabIndex = 2;
             meowButton.Text = "Cat";
             meowButton.UseVisualStyleBackColor = true;
-            meowButton.Click += meowButton_Click;
+            //meowButton.Click += meowButton_Click;
             // 
             // oinkButton
             // 
@@ -82,7 +82,7 @@
             oinkButton.TabIndex = 3;
             oinkButton.Text = "Pig";
             oinkButton.UseVisualStyleBackColor = true;
-            oinkButton.Click += oinkButton_Click;
+            //oinkButton.Click += oinkButton_Click;
             // 
             // mooButton
             // 
@@ -93,7 +93,7 @@
             mooButton.TabIndex = 4;
             mooButton.Text = "Cow";
             mooButton.UseVisualStyleBackColor = true;
-            mooButton.Click += mooButton_Click;
+            //mooButton.Click += mooButton_Click;
             // 
             // woofBox
             // 
