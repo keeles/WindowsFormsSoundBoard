@@ -39,6 +39,9 @@
             mooBox = new CheckBox();
             animalFavBox = new ListBox();
             favBox = new Label();
+            volumeBar = new TrackBar();
+            label1 = new Label();
+            ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
             SuspendLayout();
             // 
             // AnimalSoundsLabel
@@ -60,7 +63,6 @@
             woofButton.TabIndex = 1;
             woofButton.Text = "Dog";
             woofButton.UseVisualStyleBackColor = true;
-            //woofButton.Click += woofButton_Click;
             // 
             // meowButton
             // 
@@ -71,7 +73,6 @@
             meowButton.TabIndex = 2;
             meowButton.Text = "Cat";
             meowButton.UseVisualStyleBackColor = true;
-            //meowButton.Click += meowButton_Click;
             // 
             // oinkButton
             // 
@@ -82,7 +83,6 @@
             oinkButton.TabIndex = 3;
             oinkButton.Text = "Pig";
             oinkButton.UseVisualStyleBackColor = true;
-            //oinkButton.Click += oinkButton_Click;
             // 
             // mooButton
             // 
@@ -93,7 +93,6 @@
             mooButton.TabIndex = 4;
             mooButton.Text = "Cow";
             mooButton.UseVisualStyleBackColor = true;
-            //mooButton.Click += mooButton_Click;
             // 
             // woofBox
             // 
@@ -157,12 +156,31 @@
             favBox.TabIndex = 10;
             favBox.Text = "Favourites";
             // 
+            // volumeBar
+            // 
+            volumeBar.Location = new Point(860, 418);
+            volumeBar.Name = "volumeBar";
+            volumeBar.Size = new Size(156, 69);
+            volumeBar.TabIndex = 11;
+            volumeBar.Scroll += volumeBar_Scroll;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(874, 357);
+            label1.Name = "label1";
+            label1.Size = new Size(126, 32);
+            label1.TabIndex = 12;
+            label1.Text = "Volume";
+            // 
             // AnimalSoundsForm
             // 
             AutoScaleDimensions = new SizeF(18F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(40, 40, 40);
             ClientSize = new Size(1440, 576);
+            Controls.Add(label1);
+            Controls.Add(volumeBar);
             Controls.Add(favBox);
             Controls.Add(animalFavBox);
             Controls.Add(mooBox);
@@ -179,6 +197,7 @@
             Margin = new Padding(5, 4, 5, 4);
             Name = "AnimalSoundsForm";
             Text = "AnimalSoundsForm";
+            ((System.ComponentModel.ISupportInitialize)volumeBar).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -196,5 +215,7 @@
         private CheckBox mooBox;
         private ListBox animalFavBox;
         private Label favBox;
+        private TrackBar volumeBar;
+        private Label label1;
     }
 }

@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Media;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,11 +15,21 @@ namespace Comp3514Quiz2
 {
     public partial class AnimalSoundsForm : Form
     {
+        [DllImport("winmm.dll")]
+        public static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
+
+        [DllImport("winmm.dll")]
+        public static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
         private Dictionary<int, SoundPlayer> soundPlayers;
         private Dictionary<int, string> soundNames;
         public AnimalSoundsForm()
         {
             InitializeComponent();
+            uint CurrVol = 0;
+            waveOutGetVolume(IntPtr.Zero, out CurrVol);
+            ushort CalcVol = (ushort)(CurrVol & 0x0000ffff);
+            // Get the volume on a scale of 1 to 10
+            volumeBar.Value = CalcVol / (ushort.MaxValue / 10);
             soundPlayers = new Dictionary<int, SoundPlayer>();
             soundNames = new Dictionary<int, string>();
 
@@ -39,7 +50,7 @@ namespace Comp3514Quiz2
                 try
                 {
                     conn.Open();
-                    string customSoundQuery = "SELECT name, file_path, sound_id FROM animal_sounds;";
+                    string customSoundQuery = "SELECT name, file_path, id FROM sounds WHERE category_id = 2;";
 
                     using (MySqlCommand cmd = new MySqlCommand(customSoundQuery, conn))
                     {
@@ -49,7 +60,7 @@ namespace Comp3514Quiz2
                         {
                             string soundName = reader.GetString("name");
                             string soundPath = reader.GetString("file_path");
-                            int buttonId = reader.GetInt32("sound_id");
+                            int buttonId = reader.GetInt32("id");
 
                             soundPlayers[buttonId] = new SoundPlayer(soundPath);
                             soundNames[buttonId] = soundName;
@@ -62,6 +73,10 @@ namespace Comp3514Quiz2
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
+                }
+                finally
+                {
+                    conn.Close();
                 }
             }
         }
@@ -90,15 +105,15 @@ namespace Comp3514Quiz2
         private void Button_Click(object sender, EventArgs e)
         {
             Button clickedButton = sender as Button;
-            
+
             if (clickedButton == null) return;
 
             int buttonId = -1;
 
-            if (clickedButton == woofButton) buttonId = 9;
-            else if (clickedButton == meowButton) buttonId = 10;
-            else if (clickedButton == oinkButton) buttonId = 11;
-            else if (clickedButton == mooButton) buttonId = 12;
+            if (clickedButton == woofButton) buttonId = 5;
+            else if (clickedButton == meowButton) buttonId = 6;
+            else if (clickedButton == oinkButton) buttonId = 7;
+            else if (clickedButton == mooButton) buttonId = 8;
 
             if (buttonId != -1 && soundPlayers.ContainsKey(buttonId))
             {
@@ -108,11 +123,12 @@ namespace Comp3514Quiz2
                 {
                     soundPlayer.Play();
                     clickedButton.Text = "Stop";
+                    updatePlayCountInDatabase(soundName);
                 }
                 else
                 {
                     soundPlayer.Stop();
-                    clickedButton.Text = soundName; 
+                    clickedButton.Text = soundName;
                 }
             }
         }
@@ -120,11 +136,11 @@ namespace Comp3514Quiz2
         {
             if (this.woofBox.Checked)
             {
-                this.animalFavBox.Items.Add(soundNames[9]);
+                this.animalFavBox.Items.Add(soundNames[5]);
             }
             else
             {
-                this.animalFavBox.Items.Remove(soundNames[9]);
+                this.animalFavBox.Items.Remove(soundNames[5]);
             }
         }
 
@@ -132,11 +148,11 @@ namespace Comp3514Quiz2
         {
             if (this.meowBox.Checked)
             {
-                this.animalFavBox.Items.Add(soundNames[10]);
+                this.animalFavBox.Items.Add(soundNames[6]);
             }
             else
             {
-                this.animalFavBox.Items.Remove(soundNames[10]);
+                this.animalFavBox.Items.Remove(soundNames[6]);
             }
         }
 
@@ -144,11 +160,11 @@ namespace Comp3514Quiz2
         {
             if (this.oinkBox.Checked)
             {
-                this.animalFavBox.Items.Add(soundNames[11]);
+                this.animalFavBox.Items.Add(soundNames[7]);
             }
             else
             {
-                this.animalFavBox.Items.Remove(soundNames[11]);
+                this.animalFavBox.Items.Remove(soundNames[7]);
             }
         }
 
@@ -156,11 +172,50 @@ namespace Comp3514Quiz2
         {
             if (this.mooBox.Checked)
             {
-                this.animalFavBox.Items.Add(soundNames[12]);
+                this.animalFavBox.Items.Add(soundNames[8]);
             }
             else
             {
-                this.animalFavBox.Items.Remove(soundNames[12]);
+                this.animalFavBox.Items.Remove(soundNames[8]);
+            }
+        }
+
+        private void volumeBar_Scroll(object sender, EventArgs e)
+        {
+            int NewVolume = ((ushort.MaxValue / 10) * volumeBar.Value);
+            uint NewVolumeAllChannels = (((uint)NewVolume & 0x0000ffff) | ((uint)NewVolume << 16));
+            waveOutSetVolume(IntPtr.Zero, NewVolumeAllChannels);
+        }
+
+        private void updatePlayCountInDatabase(string soundName)
+        {
+            string connString = Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING");
+
+            if (connString == null)
+            {
+                MessageBox.Show("Error connecting to database");
+                return;
+            }
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(connString))
+                {
+                    conn.Open();
+
+                    string updateQuery = "UPDATE sounds SET play_count = play_count + 1 WHERE name = @soundName";
+
+                    using (MySqlCommand cmd = new MySqlCommand(updateQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@soundName", soundName);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating play count: {ex.Message}");
             }
         }
     }

@@ -1,16 +1,27 @@
 ﻿using System.Media;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using MySql.Data.MySqlClient;
 
 namespace Comp3514Quiz2
 {
     public partial class CustomSoundsForm : Form
     {
+        [DllImport("winmm.dll")]
+        public static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
+
+        [DllImport("winmm.dll")]
+        public static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
         private List<string> sounds;
         private Dictionary<string, string> soundFilePaths;
         public CustomSoundsForm()
         {
             InitializeComponent();
+            uint CurrVol = 0;
+            waveOutGetVolume(IntPtr.Zero, out CurrVol);
+            ushort CalcVol = (ushort)(CurrVol & 0x0000ffff);
+            // Get the volume on a scale of 1 to 10
+            volumeBar.Value = CalcVol / (ushort.MaxValue / 10);
             sounds = new List<string>();
             soundFilePaths = new Dictionary<string, string>();
         }
@@ -30,6 +41,7 @@ namespace Comp3514Quiz2
                         {
                             player.Play();
                         }
+                        updatePlayCountInDatabase(soundName);
                     }
                     else
                     {
@@ -77,13 +89,14 @@ namespace Comp3514Quiz2
                     {
                         conn.Open();
 
-                        string insertQuery = "INSERT INTO custom_sounds (name, file_path, button_id) VALUES (@name, @file_path, @button_id)";
+                        string insertQuery = "INSERT INTO sounds (name, file_path, category_id, button_id) VALUES (@name, @file_path, @category_id, @button_id)";
 
                         using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
                         {
-                            cmd.Parameters.AddWithValue("@name", Path.GetFileName(newSounds[0])); // Assuming newSounds[0] contains the sound file path
-                            cmd.Parameters.AddWithValue("@file_path", newSounds[0]);  // Full file path of the sound file
-                            cmd.Parameters.AddWithValue("@button_id", indexOfButton); // You can modify this part if you have a specific button ID to save.
+                            cmd.Parameters.AddWithValue("@name", Path.GetFileName(newSounds[0])); 
+                            cmd.Parameters.AddWithValue("@file_path", newSounds[0]);
+                            cmd.Parameters.AddWithValue("@category_id", 3); // Custom category is id 3
+                            cmd.Parameters.AddWithValue("@button_id", indexOfButton); 
 
                             cmd.ExecuteNonQuery();
                             MessageBox.Show("New sound added to the database!");
@@ -92,6 +105,10 @@ namespace Comp3514Quiz2
                     catch (Exception ex)
                     {
                         MessageBox.Show($"Error saving sound to database: {ex.Message}");
+                    }
+                    finally
+                    {
+                        conn.Close();
                     }
                 }
             };
@@ -207,7 +224,7 @@ namespace Comp3514Quiz2
                 try
                 {
                     conn.Open();
-                    string customSoundQuery = "SELECT name, file_path, button_id FROM custom_sounds;";
+                    string customSoundQuery = "SELECT name, file_path, button_id FROM sounds WHERE category_id = 3;";
 
                     using (MySqlCommand cmd = new MySqlCommand(customSoundQuery, conn))
                     {
@@ -224,22 +241,22 @@ namespace Comp3514Quiz2
                         if (sounds.Count > 0)
                         {
                             customSound1.Text = sounds[0];
-                            SetSoundButtonClick(customSound1, sounds[0]); 
+                            SetSoundButtonClick(customSound1, sounds[0]);
                         }
                         if (sounds.Count > 1)
                         {
                             customSound2.Text = sounds[1];
-                            SetSoundButtonClick(customSound2, sounds[1]);  
+                            SetSoundButtonClick(customSound2, sounds[1]);
                         }
                         if (sounds.Count > 2)
                         {
                             customSound3.Text = sounds[2];
-                            SetSoundButtonClick(customSound3, sounds[2]); 
+                            SetSoundButtonClick(customSound3, sounds[2]);
                         }
                         if (sounds.Count > 3)
                         {
                             customSound4.Text = sounds[3];
-                            SetSoundButtonClick(customSound4, sounds[3]);  
+                            SetSoundButtonClick(customSound4, sounds[3]);
                         }
                     }
                 }
@@ -247,6 +264,49 @@ namespace Comp3514Quiz2
                 {
                     MessageBox.Show(ex.Message);
                 }
+                finally
+                {
+                    conn.Close();
+                }
+            }
+        }
+
+        private void volumeBar_Scroll(object sender, EventArgs e)
+        {
+            int NewVolume = ((ushort.MaxValue / 10) * volumeBar.Value);
+            uint NewVolumeAllChannels = (((uint)NewVolume & 0x0000ffff) | ((uint)NewVolume << 16));
+            waveOutSetVolume(IntPtr.Zero, NewVolumeAllChannels);
+        }
+
+        private void updatePlayCountInDatabase(string soundName)
+        {
+            string connString = Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING");
+
+            if (connString == null)
+            {
+                MessageBox.Show("Error connecting to database");
+                return;
+            }
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(connString))
+                {
+                    conn.Open();
+
+                    string updateQuery = "UPDATE sounds SET play_count = play_count + 1 WHERE name = @soundName";
+
+                    using (MySqlCommand cmd = new MySqlCommand(updateQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@soundName", soundName);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating play count: {ex.Message}");
             }
         }
     }
