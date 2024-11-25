@@ -39,6 +39,9 @@
             ouchBox = new CheckBox();
             favBox = new ListBox();
             favBoxLabel = new Label();
+            label1 = new Label();
+            volumeBar = new TrackBar();
+            ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
             SuspendLayout();
             // 
             // gamerWelcomeLabel
@@ -63,7 +66,6 @@
             deathButton.TabIndex = 1;
             deathButton.Text = "Death";
             deathButton.UseVisualStyleBackColor = true;
-            deathButton.Click += deathButton_Click;
             // 
             // boomButton
             // 
@@ -74,7 +76,6 @@
             boomButton.TabIndex = 2;
             boomButton.Text = "Boom";
             boomButton.UseVisualStyleBackColor = true;
-            boomButton.Click += boomButtonClick;
             // 
             // birdButton
             // 
@@ -85,7 +86,6 @@
             birdButton.TabIndex = 3;
             birdButton.Text = "Birdies";
             birdButton.UseVisualStyleBackColor = true;
-            birdButton.Click += birdButton_Click;
             // 
             // ouchButton
             // 
@@ -96,7 +96,6 @@
             ouchButton.TabIndex = 4;
             ouchButton.Text = "Ouchie";
             ouchButton.UseVisualStyleBackColor = true;
-            ouchButton.Click += ouchButton_Click;
             // 
             // deathBox
             // 
@@ -165,12 +164,31 @@
             favBoxLabel.TabIndex = 10;
             favBoxLabel.Text = "Favourites";
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(780, 410);
+            label1.Name = "label1";
+            label1.Size = new Size(126, 32);
+            label1.TabIndex = 14;
+            label1.Text = "Volume";
+            // 
+            // volumeBar
+            // 
+            volumeBar.Location = new Point(766, 471);
+            volumeBar.Name = "volumeBar";
+            volumeBar.Size = new Size(156, 69);
+            volumeBar.TabIndex = 13;
+            volumeBar.Scroll += volumeBar_Scroll;
+            // 
             // GamerSoundsForm
             // 
             AutoScaleDimensions = new SizeF(18F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(40, 40, 40);
             ClientSize = new Size(1314, 680);
+            Controls.Add(label1);
+            Controls.Add(volumeBar);
             Controls.Add(favBoxLabel);
             Controls.Add(favBox);
             Controls.Add(ouchBox);
@@ -187,6 +205,7 @@
             Margin = new Padding(5, 4, 5, 4);
             Name = "GamerSoundsForm";
             Text = "GamerSoundsForm";
+            ((System.ComponentModel.ISupportInitialize)volumeBar).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -204,5 +223,7 @@
         private CheckBox ouchBox;
         private ListBox favBox;
         private Label favBoxLabel;
+        private Label label1;
+        private TrackBar volumeBar;
     }
 }

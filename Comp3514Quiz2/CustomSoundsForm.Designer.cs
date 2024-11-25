@@ -1,4 +1,7 @@
-﻿namespace Comp3514Quiz2
+﻿using MySql.Data.MySqlClient;
+
+
+namespace Comp3514Quiz2
 {
     partial class CustomSoundsForm
     {
@@ -40,6 +43,9 @@
             customSoundFavBox = new ListBox();
             customFavLabel = new Label();
             addCustomSoundButton = new Button();
+            label2 = new Label();
+            volumeBar = new TrackBar();
+            ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -173,12 +179,31 @@
             addCustomSoundButton.UseVisualStyleBackColor = true;
             addCustomSoundButton.Click += addCustomSoundButton_Click;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(885, 431);
+            label2.Name = "label2";
+            label2.Size = new Size(126, 32);
+            label2.TabIndex = 16;
+            label2.Text = "Volume";
+            // 
+            // volumeBar
+            // 
+            volumeBar.Location = new Point(871, 492);
+            volumeBar.Name = "volumeBar";
+            volumeBar.Size = new Size(156, 69);
+            volumeBar.TabIndex = 15;
+            volumeBar.Scroll += volumeBar_Scroll;
+            // 
             // CustomSoundsForm
             // 
             AutoScaleDimensions = new SizeF(18F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(40, 40, 40);
             ClientSize = new Size(1453, 727);
+            Controls.Add(label2);
+            Controls.Add(volumeBar);
             Controls.Add(addCustomSoundButton);
             Controls.Add(customFavLabel);
             Controls.Add(customSoundFavBox);
@@ -196,6 +221,8 @@
             Margin = new Padding(5, 4, 5, 4);
             Name = "CustomSoundsForm";
             Text = "CustomSoundsForm";
+            Load += CustomSoundsForm_Load;
+            ((System.ComponentModel.ISupportInitialize)volumeBar).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -214,5 +241,7 @@
         private ListBox customSoundFavBox;
         private Label customFavLabel;
         private Button addCustomSoundButton;
+        private Label label2;
+        private TrackBar volumeBar;
     }
 }

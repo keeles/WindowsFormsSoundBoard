@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Comp3514Quiz2": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "MYSQL_CONNECTION_STRING": "Server=localhost;Port=3306;Database=soundboard;Uid=root;Pwd=FtSpBs!4;"
+      }
+    }
+  }
+}

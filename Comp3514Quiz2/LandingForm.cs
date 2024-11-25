@@ -58,5 +58,11 @@ namespace Comp3514Quiz2
             this.landingLoadingBar.Value = 0;
             customSoundsForm.Show();
         }
+
+        private void statsButton_Click(object sender, EventArgs e)
+        {
+            var statsForm = new Stats();
+            statsForm.Show();
+        }
     }
 }

@@ -37,6 +37,7 @@
             pictureBox1 = new PictureBox();
             label1 = new Label();
             label2 = new Label();
+            statsButton = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -120,12 +121,24 @@
             label2.TabIndex = 7;
             label2.Text = "explore sounds, or add your own!";
             // 
+            // statsButton
+            // 
+            statsButton.ForeColor = Color.FromArgb(40, 40, 40);
+            statsButton.Location = new Point(108, 509);
+            statsButton.Name = "statsButton";
+            statsButton.Size = new Size(273, 55);
+            statsButton.TabIndex = 8;
+            statsButton.Text = "Sound Stats";
+            statsButton.UseVisualStyleBackColor = true;
+            statsButton.Click += statsButton_Click;
+            // 
             // LandingForm
             // 
             AutoScaleDimensions = new SizeF(18F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(40, 40, 40);
             ClientSize = new Size(1220, 686);
+            Controls.Add(statsButton);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(pictureBox1);
@@ -154,5 +167,6 @@
         private PictureBox pictureBox1;
         private Label label1;
         private Label label2;
+        private Button statsButton;
     }
 }
